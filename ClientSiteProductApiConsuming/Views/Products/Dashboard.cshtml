@@ -72,7 +72,7 @@
         <!-- Product Form -->
         <div class="form-section">
             <h2>Add/Edit Product</h2>
-            <form asp-controller="Products" asp-action="AddProduct" method="post" enctype="multipart/form-data" id="productForm">
+            <form asp-controller="Products" asp-action="AddProduct"  method="post" enctype="multipart/form-data" id="productForm">
                 @Html.AntiForgeryToken()
 
                 <div class="form-group">
@@ -135,8 +135,8 @@
                             <td>@product.Price</td>
                             <td><img src="@imageUrl" alt="Product Image" class="img-thumbnail" style="max-width: 100px;" /></td>
                             <td class="action-btns">
-                                <form asp-controller="Products" asp-action="UpdateProduct" method="get" enctype="multipart/form-data">
-                                    <input type="hidden" name="Id" value="@product.Id" />
+                                <form asp-controller="Products" asp-action="UpdateProduct" asp-route-id="@product.Id" method="get" enctype="multipart/form-data">
+                                    <input type="hidden" @* value="@product.Id" *@ />
                                     <button type="submit" class="btn btn-warning">Edit</button>
                                 </form>
                                 <form asp-controller="Products" asp-action="DeleteProduct" method="post">

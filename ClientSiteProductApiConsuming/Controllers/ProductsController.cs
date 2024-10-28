@@ -120,11 +120,12 @@ namespace ClientSiteProductApiConsuming.Controllers
                     return NotFound();
                 }
 
-            return Json(product);
-
-                return View(product);
-
-                //return RedirectToAction("Dashboard");
+            var model = new ProductViewModel
+            { 
+                Product = product
+            };
+          //  return Json(model);
+            return View(model);
 
         }
 
@@ -132,23 +133,29 @@ namespace ClientSiteProductApiConsuming.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> UpdateProduct(Product product, IFormFile imageFile)
         {
-            _logger.LogInformation("UpdateProduct method called.");
             var token = _httpContextAccessor.HttpContext.Session.GetString("JWToken");
 
             if (string.IsNullOrEmpty(token))
             {
-                _logger.LogWarning("Token is null or empty. Redirecting to Login");
                 return RedirectToAction("Login", "Account");
+            }
+
+            if (!ModelState.IsValid)
+            {
+                _logger.LogWarning("ModelState is invalid.");
+                foreach (var error in ModelState.Values.SelectMany(v => v.Errors))
+                {
+                    _logger.LogWarning($"ModelState error: {error.ErrorMessage}");
+                }
+                return View(product);
             }
 
             try
             {
-                _logger.LogInformation("ModelState is valid. Calling UpdateProductAsync.");
                 var result = await _productService.UpdateProductAsync(product, imageFile, token);
 
                 if (result)
                 {
-                    _logger.LogInformation("Product updated successfully.");
                     TempData["SuccessMessage"] = "Product updated successfully!";
                     return RedirectToAction("Dashboard");
                 }
@@ -164,21 +171,7 @@ namespace ClientSiteProductApiConsuming.Controllers
                 ModelState.AddModelError("", "An error occurred while updating the product.");
             }
 
-            if (ModelState.IsValid)
-            {
-                // Handle valid state
-            }
-            else
-            {
-                _logger.LogWarning("ModelState is invalid.");
-                foreach (var error in ModelState.Values.SelectMany(v => v.Errors))
-                {
-                    _logger.LogWarning($"ModelState error: {error.ErrorMessage}");
-                }
-            }
-
-            //return View(product);
-            return RedirectToAction("Dashboard");
+            return View(product);
         }
 
 

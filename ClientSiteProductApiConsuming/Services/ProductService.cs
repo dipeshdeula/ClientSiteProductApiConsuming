@@ -62,7 +62,6 @@ namespace ClientSiteProductApiConsuming.Services
 
 
         // Other methods follow a similar pattern
-
         public async Task<bool> UpdateProductAsync(Product product, IFormFile imageFile, string token)
         {
             _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
@@ -84,9 +83,17 @@ namespace ClientSiteProductApiConsuming.Services
                 }
             }
 
-            var response = await _httpClient.PutAsync("https://localhost:7269/api/Products", formData);
+            var response = await _httpClient.PutAsync($"https://localhost:7269/api/Products/{product.Id}", formData);
+
+            if (!response.IsSuccessStatusCode)
+            {
+                var errorContent = await response.Content.ReadAsStringAsync();
+               // _logger.LogError($"Error updating product: {response.StatusCode} - {errorContent}");
+            }
+
             return response.IsSuccessStatusCode;
         }
+
 
         public async Task<bool> DeleteProductAsync(int id, string token)
         {
